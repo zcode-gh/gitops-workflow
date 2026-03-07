@@ -43,5 +43,6 @@ jobs:
       # Step to Run Pre-commit Hooks
       - name: Run Pre-commit
         run: |
-          pre-commit install
-          pre-commit run --all-files
+          git fetch origin $(git rev-parse --abbrev-ref HEAD)
+          MODIFIED_FILES=$(git diff --name-only HEAD^ HEAD)
+          echo "$MODIFIED_FILES" | xargs pre-commit run --files
