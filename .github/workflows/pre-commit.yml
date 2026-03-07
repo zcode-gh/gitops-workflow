@@ -44,5 +44,5 @@ jobs:
       - name: Run Pre-commit
         run: |
           git fetch origin $(git rev-parse --abbrev-ref HEAD)
-          MODIFIED_FILES=$(git diff --name-only HEAD^ HEAD)
+          MODIFIED_FILES=$(git diff --name-only HEAD^ HEAD 2>/dev/null || git ls-files)
           echo "$MODIFIED_FILES" | xargs pre-commit run --files
