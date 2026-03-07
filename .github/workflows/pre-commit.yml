@@ -12,6 +12,8 @@ jobs:
       # Step to Check out the code
       - name: Checkout Code
         uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
 
      # Step to install necessary dependencies
       - name: Install dependencies
@@ -44,5 +46,5 @@ jobs:
       - name: Run Pre-commit
         run: |
           git fetch origin $(git rev-parse --abbrev-ref HEAD)
-          MODIFIED_FILES=$(git diff --name-only HEAD^ HEAD 2>/dev/null || git ls-files)
+          MODIFIED_FILES=$(git diff --name-only origin/main...HEAD)
           echo "$MODIFIED_FILES" | xargs pre-commit run --files
