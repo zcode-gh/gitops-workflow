@@ -46,5 +46,5 @@ jobs:
       - name: Run Pre-commit
         run: |
           git fetch origin $(git rev-parse --abbrev-ref HEAD)
-          MODIFIED_FILES=$(git diff --name-only origin/main...HEAD)
+          MODIFIED_FILES=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }})
           echo "$MODIFIED_FILES" | xargs pre-commit run --files
