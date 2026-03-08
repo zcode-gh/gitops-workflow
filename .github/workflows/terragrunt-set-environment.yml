@@ -1,16 +1,21 @@
-name: Check Workflow Status
+name: Terragrunt Set Environment
 
 on:
   workflow_call:
     inputs:
       # Define the input parameters for the workflow
-      main_outcome:
-        description: 'The outcome of the main job'
+      github_base_ref:
+        required: true
         type: string
-        default: 'success'
+        description: The base branch of the pull request.
+    outputs:
+      # Define the output parameters for the workflow
+      working_dir:
+        description: "The working directory based on the base branch"
+        value: ${{ jobs.terragrunt_set_environment.outputs.working_dir }}
 
 jobs:
-  check_workflow_status:
+  terragrunt_set_environment:
     name: main
     runs-on: ubuntu-latest
     steps:
@@ -18,15 +23,20 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Check Workflow Status
+      - name: Set Environment
+        id: set_env
         env:
-          STEP_MAIN_OUTCOME: ${{ inputs.main_outcome }}
+          GITHUB_BASE_REF: ${{ inputs.github_base_ref }}
         run: |
-          # Check the workflow status
+          # Determine the environment settings
 
-          if [[ "${STEP_MAIN_OUTCOME}" == "failure" ]]; then
-            echo "The workflow failed. Please check the logs for details."
-            exit 1
+          # Set the working directory based on the base branch
+          if [[ "$GITHUB_BASE_REF" == "main" ]]; then
+            WORKING_DIR=live/prod
           else
-            echo "The workflow completed successfully."
+            WORKING_DIR=live/$GITHUB_BASE_REF
           fi
+          echo "${WORKING_DIR}"
+          echo "working_dir=${WORKING_DIR}" >> $GITHUB_OUTPUT
+    outputs:
+      working_dir: ${{ steps.set_env.outputs.working_dir }}
