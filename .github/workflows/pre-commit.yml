@@ -51,6 +51,15 @@ jobs:
           NEW_PATH=$(direnv exec . bash -c 'echo $PATH')
           echo "PATH=$NEW_PATH" >> $GITHUB_ENV
 
+     # Step to cache pre-commit environments
+      - name: Cache pre-commit envs
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pre-commit
+          key: pre-commit-${{ hashFiles('.pre-commit-config.yaml') }}
+          restore-keys: |
+            pre-commit-
+
       # Step to run Pre-commit Hooks only to files which have changed
       - name: Run Pre-commit
         id: main
