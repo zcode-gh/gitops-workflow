@@ -1,3 +1,10 @@
+# [1.2.0](https://github.com/zcode-gh/gitops-workflow/compare/v1.1.0...v1.2.0) (2026-04-03)
+
+
+### Features
+
+* usage of git submodule ([dbb41f0](https://github.com/zcode-gh/gitops-workflow/commit/dbb41f03c1dbf61becf3dbe02e2b669021e70b16))
+
 # [1.1.0](https://github.com/zcode-gh/gitops-workflow/compare/v1.0.0...v1.1.0) (2026-04-02)
 
 
