@@ -8,6 +8,21 @@ on:
         required: true
         type: string
         description: "The base64 encoded list of modified files to check"
+      owner:
+        required: true
+        description: "Owner of the repository"
+        type: string
+      repositories:
+        required: true
+        description: "Comma-separated list of repositories to generate tokens for"
+        type: string
+    secrets:
+      github_app_id:
+        required: true
+        description: "GitHub App ID for token generation"
+      github_app_private_key:
+        required: true
+        description: "Private key for the GitHub App to generate a token"
     outputs:
       # Define the output parameters for the workflow.
       main_outcome:
@@ -20,9 +35,23 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # Step to generate GitHub App token
+      - name: Generate GitHub App Token
+        uses: actions/create-github-app-token@df432ceedc7162793a195dd1713ff69aefc7379e # v2.0.6
+        id: app-token
+        with:
+          app-id: ${{ secrets.github_app_id }}
+          private-key: ${{ secrets.github_app_private_key }}
+          owner: ${{ inputs.owner }}
+          repositories: ${{ inputs.repositories }}
+
       # Step to check out the code
       - name: Checkout Code
         uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          persist-credentials: false
+          token: ${{ steps.app-token.outputs.token }}
 
       - name: Install dependencies
         run: |
@@ -45,7 +74,7 @@ jobs:
       - name: Setup Repository
         run: |
           # Setup the repository
-          ./bootstrap.sh # this script should be present in the caller repository and should run pre-commit install
+          SKIP=init_git_submodule ./bootstrap.sh # this script should be present in the caller repository and should run pre-commit install
 
           # Extract the updated PATH and write it to GITHUB_ENV
           NEW_PATH=$(direnv exec . bash -c 'echo $PATH')
