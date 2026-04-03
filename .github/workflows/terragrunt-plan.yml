@@ -20,7 +20,21 @@ on:
         description: "GitHub event pull request number"
         required: true
         type: number
+      owner:
+        required: true
+        description: "Owner of the repository"
+        type: string
+      repositories:
+        required: true
+        description: "Comma-separated list of repositories to generate tokens for"
+        type: string
     secrets:
+      github_app_id:
+        required: true
+        description: "GitHub App ID for token generation"
+      github_app_private_key:
+        required: true
+        description: "Private key for the GitHub App to generate a token"
       github_secret_token:
         required: true
         description: "The GitHub token to call modules from other repositories"
@@ -60,9 +74,23 @@ jobs:
           - 4566:4566
 
     steps:
+      # Step to generate GitHub App token
+      - name: Generate GitHub App Token
+        uses: actions/create-github-app-token@df432ceedc7162793a195dd1713ff69aefc7379e # v2.0.6
+        id: app-token
+        with:
+          app-id: ${{ secrets.github_app_id }}
+          private-key: ${{ secrets.github_app_private_key }}
+          owner: ${{ inputs.owner }}
+          repositories: "${{ inputs.repositories }}, gitops-tools"
+
       # Step to checkout the code
       - name: Checkout Code
         uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          persist-credentials: false
+          token: ${{ steps.app-token.outputs.token }}
 
      # Caching Terraform and Terragrunt dependencies
       - name: Cache Terragrunt
@@ -82,7 +110,7 @@ jobs:
         run: |
           # Set up the repository
 
-          SKIP=enable_pre_commit ./bootstrap.sh # this script should be present in the caller repository
+          SKIP=enable_pre_commit,init_git_submodule ./bootstrap.sh # this script should be present in the caller repository
 
           # Extract the updated PATH and write it to GITHUB_ENV
           NEW_PATH=$(direnv exec . bash -c 'echo $PATH')
