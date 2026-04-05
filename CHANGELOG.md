@@ -1,3 +1,10 @@
+# [1.3.0](https://github.com/zcode-gh/gitops-workflow/compare/v1.2.0...v1.3.0) (2026-04-05)
+
+
+### Features
+
+* adapt ci to use scripts from tools repo ([8960eb4](https://github.com/zcode-gh/gitops-workflow/commit/8960eb4fdd1c42732fb2f6add28578f10a30a55d))
+
 # [1.2.0](https://github.com/zcode-gh/gitops-workflow/compare/v1.1.0...v1.2.0) (2026-04-03)
 
 
